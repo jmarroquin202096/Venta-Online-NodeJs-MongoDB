@@ -1,5 +1,6 @@
 const Usuarios = require('../model/usuarios.model');
 const mongoose = require('mongoose');
+const bcrypt = require("bcrypt-nodejs");
 const jwt = require("../services/jwt");
 
 
