@@ -44,8 +44,8 @@ function registrar(req, res) {
         Usuarios.find({ email: parametros.email }, (err, emailEncontrado) => {
             if (emailEncontrado.length == 0) {
                 bcrypt.hash(parametros.password, null, null, (err, passwordEncriptada) => {
-                    modeloUsuario.password = passwordEncriptada;
-                    modeloUsuario.save((err, usuarioGuardado) => {
+                    usuarioModel.password = passwordEncriptada;
+                    usuarioModel.save((err, usuarioGuardado) => {
                         if (err) return res.status(500).send({ mensaje: "Error en la Peticion" });
                         if (!usuarioGuardado) return res.status(500).send({ mensaje: "Error al Registrar Usuaurio" });
 
@@ -57,15 +57,19 @@ function registrar(req, res) {
         });
 
     }else {
-        return res.status(500).send({ mensaje: "Tiene que  ingresar los parametros obligatorios" });
+        return res.status(500).send({ mensaje: "Tiene que  ingresar los su Email y Password" });
     }
 }
 
 function editarUsuario(req, res) {
+    var  idUsuario = req.params.idUsuario;
     var parametros = req.body;
+
     delete parametros.password;
 
-    Usuarios.findByIdAndUpdate(req.user.sub, parametros, { new: true }, (err, usuarioEditado) => {
+    if(idUsuario !== req.user.sub) return res.status(500).send({ mensaje: "No puede Editar este Usuario"});
+
+    Usuarios.findByIdAndUpdate(idUsuario, parametros, { new: true }, (err, usuarioEditado) => {
         if (err) return res.status(500).send({ mensaje: "Error en  la peticion" });
         if (!usuarioEditado) return res.status(500).send({ mensaje: "Error al editar el Usuario" });
 
@@ -75,11 +79,13 @@ function editarUsuario(req, res) {
 }
 
 function eliminarUsuario(req, res) {
+    var usuarioId = req.params.idUsuario;
+
+    if(req.user.sub !== usuarioId) return res.status(403).send({ mensaje: "No puedes Eliminar otros Usuarios"});
 
     Empresas.findByIdAndDelete(req.user.sub, (err, usuarioEliminada) => {
         if (err) return res.status(500).send({ mensaje: "Error en la Petición" });
-        if (!usuarioEliminada)
-            return res.status(500).send({ mensaje: "No se puede eliminar la Empresa" });
+        if (!usuarioEliminada) return res.status(500).send({ mensaje: "No se puede eliminar la Empresa" });
 
         return res.status(200).send({ usuario: usuarioEliminada });
     });

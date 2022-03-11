@@ -3,7 +3,7 @@ const cors = require('cors');
 const app = express();
 
 /*Importaciones*/
-//const usuarioRoutes = require('./src/Routes/usuario.routes');
+const usuarioRoutes = require('./src/routes/usuario.routes');
 //const empresaRoutes = require('./src/Routes/empresas.routes');
 
 
@@ -15,6 +15,6 @@ app.use(express.json());
 app.use(cors());
 
 /*Rutas*/
-//app.use('/api', usuarioRoutes, empresaRoutes);
+app.use('/api', usuarioRoutes);
 
 module.exports = app;
