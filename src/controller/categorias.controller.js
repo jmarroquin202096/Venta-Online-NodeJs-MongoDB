@@ -81,9 +81,21 @@ function visualizarCategorias(req, res) {
     }).populate('idCategoria', 'nombre');
 }
 
+function buscarCategoriaporNombre(req, res) {
+    var nombreCate = req.params.nombreCategoria; 
+
+    Categorias.findOnde({nombre: nombreCate}, (err, categoriaEncontrada)=>{
+        if(err) return res.status(500).send({ mensaje: "Error en la Petición"});
+        if(!categoriaEncontrada) return res.status(404).send({ mensaje: "Error al Encontrar Categoria"});
+
+        return res.status(200).send({ categoria: categoriaEncontrada});
+    });
+}
+
 module.exports = {
     agregarCategoria,
     editarCategoria,
     eliminarCategoria,
-    visualizarCategorias
+    visualizarCategorias, 
+    buscarCategoriaporNombre
 }

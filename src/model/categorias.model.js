@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const categoriasSchema = new Schema({
-    nombre : "nombre"
+    nombre : String
 });
 
 module.exports = ("Categorias", categoriasSchema);

@@ -10,5 +10,6 @@ api.post('/agregarCategoria', [md_autentificacion.Auth, md_role.verAdmin], contr
 api.put('/editarCategoria/:idCategoria', [md_autentificacion.Auth, md_role.verAdmin], controllerCategoria.editarCategoria);
 api.delete('/eliminarCategoria/:idCategoria', [md_autentificacion.Auth, md_role.verAdmin], controllerCategoria.eliminarCategoria);
 api.get('/buscarCategoria', [md_autentificacion.Auth, md_role.verAdmin], controllerCategoria.visualizarCategorias);
+api.get('/buscarCategoriaporNombre', md_autentificacion.Auth, controllerCategoria.buscarCategoriaporNombre);
 
 module.exports = api;

@@ -10,5 +10,6 @@ api.post('/agregarProductos', [md_autentificacion.Auth, md_role.verAdmin],contro
 api.put('/editarProductos/:idProducto', [md_autentificacion.Auth, md_role.verAdmin], controllerProducto.editarProductos);
 api.delete('/eliminarProductos/:idProducto', [md_autentificacion.Auth, md_role.verAdmin], controllerProducto.eliminarProductos);
 api.get('/buscarProducto', [md_autentificacion.Auth, md_role.verAdmin], controllerProducto.visualiarProducto);
+api.get('/buscarProductoporNombre', md_autentificacion.Auth, controllerProducto.buscarProductosporNombre);
 
 module.exports = api;

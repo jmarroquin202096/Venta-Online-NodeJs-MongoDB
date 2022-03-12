@@ -51,9 +51,22 @@ function visualiarProducto(req, res) {
     });
 }
 
+function buscarProductosporNombre(req, res) {
+    var nombreProducto = req.parmas.nombreProducto;
+
+    Productos.findOne({nombre: nombreProducto}, (err, productoEncontrado) => {
+        if(err) return res.status(500).send({mensaje: "Error en la Petición"});
+        if(!productoEncontrado) return res.status(500).send({mensaje: "Error al Encontrar el Producto"});
+
+        return res.status(200).send({producto: productoEncontrado});
+
+    });
+}
+
 module.exports = {
     agregarProductos, 
     editarProductos,
     eliminarProductos,
-    visualiarProducto
+    visualiarProducto,
+    buscarProductosporNombre
 }
