@@ -8,4 +8,4 @@ const productoSchema = new Schema({
     idCategoria: {type: Schema.Types.ObjectId, ref: 'Categorias'}
 }); 
 
-module.exports = ('Productos', productoSchema);
+module.exports = mongoose.model('Productos', productoSchema);

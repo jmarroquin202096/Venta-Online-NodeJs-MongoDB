@@ -14,7 +14,7 @@ function agregarProductos(req, res) {
             if(err) return res.status(500).send({mensaje: "Error en la Petición"});
             if(!productoGuardado) return res.status(500).send({mensaje: "Error al Guardar el Producto"});
 
-            return res.status(200).send({categoria: categoriaGuardada});
+            return res.status(200).send({producto: productoGuardado});
         });
     }
 }
@@ -52,9 +52,9 @@ function visualiarProducto(req, res) {
 }
 
 function buscarProductosporNombre(req, res) {
-    var nombreProducto = req.parmas.nombreProducto;
+    var parametros = req.body;
 
-    Productos.findOne({nombre: nombreProducto}, (err, productoEncontrado) => {
+    Productos.find({nombre: {$regex: parametros.nombre, $options: "i" }}, (err, productoEncontrado) => {
         if(err) return res.status(500).send({mensaje: "Error en la Petición"});
         if(!productoEncontrado) return res.status(500).send({mensaje: "Error al Encontrar el Producto"});
 
@@ -63,10 +63,20 @@ function buscarProductosporNombre(req, res) {
     });
 }
 
+function productoAgotados(req, res) {
+    Productos.find({cantidad: 0}, (err, productoEncontrado) => {
+        if(err) return res.status(500).send({mensaje: "Error en la Petición" });
+        if(!productoEncontrado) return res.status(500).send({mensaje: "Error al Encontrar Producto Agotados"});
+
+        return res.status(200).send({producto: productoEncontrado});
+    });
+}
+
 module.exports = {
     agregarProductos, 
     editarProductos,
     eliminarProductos,
     visualiarProducto,
-    buscarProductosporNombre
+    buscarProductosporNombre,
+    productoAgotados
 }

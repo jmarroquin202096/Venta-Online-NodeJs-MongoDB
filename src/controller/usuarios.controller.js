@@ -81,9 +81,7 @@ function editarUsuario(req, res) {
 function eliminarUsuario(req, res) {
     var usuarioId = req.params.idUsuario;
 
-    if(usuarioId !== req.user.sub) return res.status(403).send({ mensaje: "No puedes Eliminar otros Usuarios"});
-
-    Empresas.findByIdAndDelete(usuarioId, (err, usuarioEliminada) => {
+    Usuarios.findByIdAndDelete(usuarioId, (err, usuarioEliminada) => {
         if (err) return res.status(500).send({ mensaje: "Error en la Petición" });
         if (!usuarioEliminada) return res.status(500).send({ mensaje: "No se puede eliminar la Empresa" });
 

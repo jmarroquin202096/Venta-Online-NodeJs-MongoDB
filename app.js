@@ -4,9 +4,10 @@ const app = express();
 
 /*Importaciones*/
 const usuarioRoutes = require('./src/routes/usuario.routes');
-//const empresaRoutes = require('./src/Routes/empresas.routes');
+//const facturasRoutes = require('./src/routes/facturas.routes');
 const categoriaRoutes = require('./src/routes/categorias.routes');
 const productoRoutes = require('./src/routes/productos.routes');
+//const carritoRoutes = require('./src/routes/carrito.routes');
 
 
 /*Middlewares*/
@@ -17,6 +18,6 @@ app.use(express.json());
 app.use(cors());
 
 /*Rutas*/
-app.use('/api', usuarioRoutes, categoriaRoutes, productoRoutes);
+app.use('/api', usuarioRoutes, categoriaRoutes,  productoRoutes);
 
 module.exports = app;
