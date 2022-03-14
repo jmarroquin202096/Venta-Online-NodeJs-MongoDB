@@ -1,46 +1,79 @@
 const Facturas = require('../model/facturas.model');
-const Carritos = require('../model/carrito.model');
-const Productos = require('../model/productos.model');
+const Usuarios = require('../model/usuarios.model');
+const PDF = require('pdfkit');
+const fs = require('fs');
 
 function agregarFactura(req, res) {
     var parametros = req.body;
-    var idCarrito = req.params.idCarrito;
-    var idProducto = req.params.idProducto;
+    var modelFactura = new Facturas();
 
-    Carritos.findById(idCarrito, (err, carritoEncontrado) => {
-        if (err) return res.status(500).send({ mensaje: "Error al Encontrar Carrito" });
-        if (!carritoEncontrado) {
-            Productos.findById(idProducto, (err, productoEncontrado) => {
-                if (err) return res.status(500).send({ mensaje: "Error en la Petición" });
-                if (!productoEncontrado) {
-                    const modelFactura = new Facturas();
-                    if (parametros.nombre && parametros.nit) {
-                        modelFactura.nombre = parametros.nombre;
-                        modelFactura.nit = parametros.nit;
-                        modelFactura.idCarrito = parametros.idCarrito;
-                        modelFactura.idProducto = parametros.idProducto;
+    if(parametros.nit) {
+        modelFactura.idUsuario = req.user.sub;
+        modelFactura.nit = parametros.nit;
 
-                        for (i = 1; i <= productoEncontrado.length; i++) {
-                            for(j = 1; i = carritoEncontrado.length; j++) {
-                               modelFactura.subTotal =  productoEncontrado[i].Precio * carritoEncontrado[j].Strock;
-                               modelFactura.total = modelFactura.subTotal;
-                            }
-                            
-                        }
+        modelFactura.save((err, facturaGuardada) => {
+            if(err) return res.status(500).send({ mensaje: "Error en la Petición" });
+            if(!facturaGuardada) return res.status(500).send({mensaje: "Error al Agregar Factura" });
 
-                } else {
-                    return res.status(500).send({ mensaje: "Tine que ingresar Todos lod Datos"});
-                }
-                }else {
-                    if(err) return res.status(500).send({ mensaje: "Error al Encontrar Producto"})
-                }
-            })
-
-        }
-    });
+            return res.status(200).send({factura: facturaGuardada});
+        });
+    } else {
+        return res.status(500).send({ mensaje: "Debe Ingresar los Datos Necesarios"});
+    }
 
 }
 
+function visualizarFacturasClientes(req, res) {
+    Facturas.find({}, (err, facturaEncontrada) => {
+        if(err) return res.status(500).send({ mensaje: "Error en la Petición" });
+        if(!facturaEncontrada) return res.status(500).send({ mensaje: "Error al Encontrar Factura" });
+
+        return res.status(200).send({factura: facturaEncontrada});
+    });
+}
+
+function visualizarFacturasporProductos(req, res) {
+
+}
+
+
+function productomasVendido(req, res) {
+    Facturas.find({idUsuario: {$elemMatch: {carrito: {nombreProducto: {$gte: 1}}}  }}, (err, facturaEncontrada) => {
+        if(err) return res.status(500).send({ mensaje: "Error en la Petición" });
+        if(!facturaEncontrada) return res.status(500).send({ mensaje: "Error al Encontrar Factura" });
+
+        return res.status(200).send({factura: facturaEncontrada});
+    });
+}  
+
+function pdfFactura(req, res) {
+    var nit = req.params.nit;
+    Usuarios.findOne({idUsuario : req.user.sub}, (err, usuaarioEncontrado) =>{
+        if(err) return res.status(500).send({mensaje: "Error en la Petición"});
+        Facturas.find({nit: nit}, (err, encontrarFactura) =>{
+            var doc = new PDF();
+            doc.pipe(fs.createWriteStream(__dirname + '/factura.pdf'));
+            doc.text("Factura");
+            doc.text("Nombre:  " + usuaarioEncontrado.nombre);
+            doc.text("NIT:   " +encontrarFactura.nit);
+            doc.text(usuaarioEncontrado.carrito);
+            doc.text('Sub Total:   ' + usuaarioEncontrado.subTotal);
+            doc.text('Total:    ' + usuaarioEncontrado.total);
+            doc.text("Firma ______________________________" ) ;
+
+            doc.end();
+        })
+       
+
+    });
+}
+
+
+
 module.exports = {
-    agregarFactura
+    agregarFactura,
+    visualizarFacturasClientes,
+    visualizarFacturasporProductos,
+    productomasVendido,
+    pdfFactura
 }

@@ -1,4 +1,5 @@
 const Usuarios = require('../model/usuarios.model');
+const Productos = require('../model/productos.model');
 const mongoose = require('mongoose');
 const bcrypt = require("bcrypt-nodejs");
 const jwt = require("../services/jwt");
@@ -109,10 +110,41 @@ function login(req, res) {
     });
 }
 
+function carrito(req, res) {
+    var parametros = req.body;
+
+    Productos.findOne({nombre: parametros.nombreProducto}, (err, productoEncontrado) => {
+        if(err) return res.status(500).send({ mensaje: "Error en la Petición"});
+        if(!productoEncontrado) return res.status(500).send({ mensaje: "Error al encontrar el Producto"});
+
+        Usuarios.findByIdAndUpdate(req.user.sub, {$push: {carrito: {nombreProducto: parametros.nombreProducto, cantidad: parametros.cantidad, precio: parametros.precio}}},
+            {new: true}, (err, carritoAgregado) => {
+                if(err) return res.status(500).send({mensaje: "Erro en la Petición"});
+                if(!carritoAgregado) return res.status(500).send({mensaje: "Error al Agregar Carrito"});
+
+                let carritosubTotal = 0;
+                let carritoTotal = 0;
+                for(let i = 0; i < carritoAgregado.carrito.length; i++) {
+                    carritosubTotal = carritoAgregado.carrito[i].precio * carritoAgregado.carrito[i].cantidad;
+                    carritoTotal = carritosubTotal;
+                    carritoTotal = carritoTotal;
+                }
+
+                Usuarios.findByIdAndUpdate(req.user.sub, {subTotal : carritosubTotal, total: carritoTotal}, {new: true}, (err, carritoAgregado) => {
+                    if(err) return res.status(500).send({mensaje: "Error en la Petición"});
+                    if(!carritoAgregado) return res.status(500).send({mensaje: "No se Agrego el Carrito"});
+
+                    return res.status(200).send({usuario: carritoAgregado});
+                })
+            });
+    });
+}
+
 module.exports = {
     admin,
     registrar,
     editarUsuario,
     eliminarUsuario,
-    login
+    login,
+    carrito
 };
