@@ -68,8 +68,6 @@ function editarUsuario(req, res) {
 
     delete parametros.password;
 
-    if(idUsuario !== req.user.sub) return res.status(500).send({ mensaje: "No puede Editar este Usuario"});
-
     Usuarios.findByIdAndUpdate(idUsuario, parametros, { new: true }, (err, usuarioEditado) => {
         if (err) return res.status(500).send({ mensaje: "Error en  la peticion" });
         if (!usuarioEditado) return res.status(500).send({ mensaje: "Error al editar el Usuario" });
